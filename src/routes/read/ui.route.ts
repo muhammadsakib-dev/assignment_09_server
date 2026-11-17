@@ -1,6 +1,6 @@
 // Import necessary modules
 import { Router } from "express";
-import { navItems, navItemsAdmin } from "../../data/ui/navbar.js";
+import { navbarConfig } from "../../data/ui/navbar.js";
 import sendResponse from "../../utils/sendResponse.js";
 
 const router = Router();
@@ -12,10 +12,7 @@ router.get("/", (_req, res) => {
     success: true,
     message: "All UI data retrieved successfully",
     data: {
-      navbar: {
-        navItems,
-        navItemsAdmin,
-      },
+      navbar: navbarConfig,
       // Other UI data (e.g. footer, sidebar) can be added here
     },
   });
