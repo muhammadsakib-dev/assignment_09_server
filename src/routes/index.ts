@@ -1,13 +1,16 @@
 // Import necessary modules
 import { Router } from "express";
 import createBookingRouter from "./create/booking.route.js";
+import createCheckoutRouter from "./create/checkout.route.js";
 import createSavedRouter from "./create/saved.route.js";
 import createServiceRouter from "./create/service.route.js";
+import createWebhookRouter from "./create/webhook.route.js";
 import deleteAdminRouter from "./delete/admin.route.js";
 import deleteSavedRouter from "./delete/saved.route.js";
 import deleteServiceRouter from "./delete/service.route.js";
 import readAdminRouter from "./read/admin.route.js";
 import readBookingRouter from "./read/booking.route.js";
+import readCheckoutRouter from "./read/checkout.route.js";
 import healthRouter from "./read/health.route.js";
 import readProfileRouter from "./read/profile.route.js";
 import readSavedRouter from "./read/saved.route.js";
@@ -38,6 +41,7 @@ router.use("/saved", readSavedRouter);
 router.use("/services", readServiceRouter);
 router.use("/profile", readProfileRouter);
 router.use("/admin", readAdminRouter);
+router.use("/checkout", readCheckoutRouter);
 
 // ==========================================
 // 2. CREATE Routes (POST)
@@ -45,6 +49,8 @@ router.use("/admin", readAdminRouter);
 router.use("/bookings", createBookingRouter);
 router.use("/saved", createSavedRouter);
 router.use("/services", createServiceRouter);
+router.use("/checkout", createCheckoutRouter);
+router.use("/webhook", createWebhookRouter);
 
 // ==========================================
 // 3. UPDATE Routes (PUT / PATCH)

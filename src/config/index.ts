@@ -10,6 +10,8 @@ export interface Config {
   serverUrl: string;
   mongoUri: string;
   dbName: string;
+  stripeSecretKey: string;
+  stripeWebhookSecret: string;
 }
 
 // Configuration values -- store value from environment variables
@@ -20,6 +22,8 @@ export const config: Config = {
   serverUrl: process.env.API_BASE_URL || "http://localhost:8000",
   mongoUri: process.env.MONGODB_URI || "",
   dbName: process.env.DB_NAME || "WedPlan",
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "",
 };
 
 export default config;
