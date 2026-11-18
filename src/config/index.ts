@@ -14,12 +14,12 @@ export interface Config {
 
 // Configuration values -- store value from environment variables
 export const config: Config = {
-  port: Number(process.env.PORT),
-  authSecret: process.env.BETTER_AUTH_SECRET as string,
-  clientUrl: process.env.BETTER_AUTH_URL as string,
-  serverUrl: process.env.API_BASE_URL as string,
-  mongoUri: process.env.MONGODB_URI as string,
-  dbName: process.env.DB_NAME as string
+  port: Number(process.env.PORT) || 8000,
+  authSecret: process.env.BETTER_AUTH_SECRET || "",
+  clientUrl: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  serverUrl: process.env.API_BASE_URL || "http://localhost:8000",
+  mongoUri: process.env.MONGODB_URI || "",
+  dbName: process.env.DB_NAME || "WedPlan",
 };
 
 export default config;
