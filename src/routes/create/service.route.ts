@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { ObjectId } from "mongodb";
 import { getDB } from "../../config/db.js";
 import requireAuth from "../../middlewares/requireAuth.js";
 import requireRole from "../../middlewares/requireRole.js";
@@ -10,6 +9,10 @@ import {
 } from "../../types/service.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
+import {
+  buildUserFilter,
+  isActivePremiumSubscription,
+} from "../../utils/subscription.js";
 
 const router = Router();
 
@@ -77,19 +80,19 @@ router.post(
     }
 
     const db = getDB();
-    const userFilter = ObjectId.isValid(authUser.id)
-      ? { $or: [{ _id: new ObjectId(authUser.id) }, { id: authUser.id }] }
-      : { id: authUser.id };
-    const vendorDoc = await db.collection("user").findOne(userFilter, {
-      projection: {
-        subscriptionPlan: 1,
-        businessName: 1,
-        name: 1,
-        phone: 1,
-      },
-    });
+    const vendorDoc = await db
+      .collection("user")
+      .findOne(buildUserFilter(authUser.id, authUser.email), {
+        projection: {
+          subscriptionPlan: 1,
+          subscriptionExpiresAt: 1,
+          businessName: 1,
+          name: 1,
+          phone: 1,
+        },
+      });
 
-    const isPremium = vendorDoc?.subscriptionPlan === "premium";
+    const isPremium = isActivePremiumSubscription(vendorDoc);
     const servicesCol = db.collection<VendorServiceDocument>("services");
 
     // Enforce Free Plan 3-active-service cap on the server

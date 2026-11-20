@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { ObjectId } from "mongodb";
 import { getDB } from "../../config/db.js";
 import requireAuth from "../../middlewares/requireAuth.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
+import { buildUserFilter } from "../../utils/subscription.js";
 
 const router = Router();
 
@@ -66,9 +66,7 @@ router.patch(
     }
 
     const db = getDB();
-    const userFilter = ObjectId.isValid(authUser.id)
-      ? { $or: [{ _id: new ObjectId(authUser.id) }, { id: authUser.id }] }
-      : { id: authUser.id };
+    const userFilter = buildUserFilter(authUser.id, authUser.email);
 
     await db.collection("user").updateOne(userFilter, { $set: updates });
 

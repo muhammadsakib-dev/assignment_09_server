@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 import { getDB } from "../config/db.js";
 import config from "../config/index.js";
 import sendResponse from "../utils/sendResponse.js";
+import { buildUserFilter } from "../utils/subscription.js";
 
 export interface AuthenticatedUser {
   id: string;
@@ -142,6 +143,7 @@ export async function requireAuth(
 
     const db = getDB();
     let resolvedUserId: string | null = null;
+    let resolvedEmail: string | null = null;
 
     // 1. Primary path: Verify Bearer JWT in Authorization header
     const bearerToken = extractBearerToken(req.headers.authorization);
@@ -156,6 +158,9 @@ export async function requireAuth(
         return;
       }
       resolvedUserId = String(payload.sub);
+      if (payload.email) {
+        resolvedEmail = String(payload.email).trim().toLowerCase();
+      }
     } else {
       // 2. Fallback path: Verify Better Auth signed session cookie
       const rawCookie = extractSessionCookie(req.headers.cookie);
@@ -199,15 +204,17 @@ export async function requireAuth(
     }
 
     // Always look up live user record from MongoDB to enforce current role & isBlocked status
-    const userQuery = ObjectId.isValid(resolvedUserId)
-      ? { $or: [{ _id: new ObjectId(resolvedUserId) }, { id: resolvedUserId }] }
-      : { id: resolvedUserId };
+    const userQuery = buildUserFilter(resolvedUserId, resolvedEmail);
 
     const user = await db.collection("user").findOne(userQuery, {
       projection: { _id: 1, id: 1, name: 1, email: 1, role: 1, isBlocked: 1 },
     });
 
-    if (!user || !user.email) {
+    const finalEmail = user?.email
+      ? String(user.email).trim().toLowerCase()
+      : resolvedEmail;
+
+    if (!user || !finalEmail) {
       sendResponse(res, {
         statusCode: 401,
         success: false,

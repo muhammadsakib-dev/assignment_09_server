@@ -10,6 +10,10 @@ import {
 } from "../../types/service.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
+import {
+  buildUserFilter,
+  isActivePremiumSubscription,
+} from "../../utils/subscription.js";
 
 const router = Router();
 
@@ -115,14 +119,13 @@ router.patch(
     }
     if (typeof body.isActive === "boolean") {
       if (body.isActive && !existing.isActive) {
-        const userFilter = ObjectId.isValid(authUser.id)
-          ? { $or: [{ _id: new ObjectId(authUser.id) }, { id: authUser.id }] }
-          : { id: authUser.id };
-        const vendorDoc = await db.collection("user").findOne(userFilter, {
-          projection: { subscriptionPlan: 1 },
-        });
+        const vendorDoc = await db
+          .collection("user")
+          .findOne(buildUserFilter(authUser.id, authUser.email), {
+            projection: { subscriptionPlan: 1, subscriptionExpiresAt: 1 },
+          });
 
-        if (vendorDoc?.subscriptionPlan !== "premium") {
+        if (!isActivePremiumSubscription(vendorDoc)) {
           const activeCount = await servicesCol.countDocuments({
             vendorEmail: authUser.email,
             isActive: true,

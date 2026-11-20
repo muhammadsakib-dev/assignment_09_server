@@ -1,9 +1,12 @@
 import { Router } from "express";
-import { ObjectId } from "mongodb";
 import { getDB } from "../../config/db.js";
 import requireAuth from "../../middlewares/requireAuth.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
+import {
+  buildUserFilter,
+  isActivePremiumSubscription,
+} from "../../utils/subscription.js";
 
 const router = Router();
 
@@ -23,9 +26,7 @@ router.get(
     }
 
     const db = getDB();
-    const userFilter = ObjectId.isValid(authUser.id)
-      ? { $or: [{ _id: new ObjectId(authUser.id) }, { id: authUser.id }] }
-      : { id: authUser.id };
+    const userFilter = buildUserFilter(authUser.id, authUser.email);
 
     const user = await db.collection("user").findOne(userFilter, {
       projection: {
@@ -38,6 +39,7 @@ router.get(
         location: 1,
         businessName: 1,
         subscriptionPlan: 1,
+        subscriptionExpiresAt: 1,
       },
     });
 
@@ -49,6 +51,38 @@ router.get(
       });
       return;
     }
+
+    const activePremium =
+      authUser.role === "vendor" && isActivePremiumSubscription(user);
+
+    // Auto-downgrade expired vendor subscriptions cleanly
+    if (
+      authUser.role === "vendor" &&
+      user.subscriptionPlan === "premium" &&
+      !activePremium
+    ) {
+      await db.collection("user").updateOne(userFilter, {
+        $set: {
+          subscriptionPlan: "free",
+          subscriptionExpiresAt: null,
+          updatedAt: new Date(),
+        },
+      });
+      await db.collection("services").updateMany(
+        { vendorEmail: authUser.email },
+        {
+          $set: {
+            vendorIsPremium: false,
+            updatedAt: new Date(),
+          },
+        },
+      );
+    }
+
+    const subscriptionExpiresAt =
+      activePremium && user.subscriptionExpiresAt
+        ? new Date(user.subscriptionExpiresAt as string | Date).toISOString()
+        : null;
 
     sendResponse(res, {
       statusCode: 200,
@@ -64,8 +98,8 @@ router.get(
         location: typeof user.location === "string" ? user.location : "",
         businessName:
           typeof user.businessName === "string" ? user.businessName : "",
-        subscriptionPlan:
-          user.subscriptionPlan === "premium" ? "premium" : "free",
+        subscriptionPlan: activePremium ? "premium" : "free",
+        subscriptionExpiresAt,
       },
     });
   }),
