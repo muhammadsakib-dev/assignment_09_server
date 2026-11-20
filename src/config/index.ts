@@ -11,6 +11,7 @@ export interface Config {
   mongoUri: string;
   dbName: string;
   stripeSecretKey: string;
+  stripePublishableKey: string;
   stripeWebhookSecret: string;
 }
 
@@ -23,6 +24,7 @@ export const config: Config = {
   mongoUri: process.env.MONGODB_URI || "",
   dbName: process.env.DB_NAME || "WedPlan",
   stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
+  stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || "",
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "",
 };
 

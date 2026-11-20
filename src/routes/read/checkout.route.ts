@@ -5,6 +5,7 @@ import requireAuth from "../../middlewares/requireAuth.js";
 import requireRole from "../../middlewares/requireRole.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
+import { activatePremiumForSession } from "../create/webhook.route.js";
 
 const router = Router();
 
@@ -145,20 +146,24 @@ router.get(
         return;
       }
 
+      if (session.payment_status === "paid") {
+        await activatePremiumForSession(session);
+      }
+
       sendResponse(res, {
         statusCode: 200,
         success: true,
         message:
           session.payment_status === "paid"
-            ? "Payment received. Awaiting verified Stripe webhook confirmation."
+            ? "Payment verified and Premium subscription activated successfully."
             : "Checkout session status retrieved.",
         data: {
           sessionId: id,
           status:
             session.payment_status === "paid"
-              ? "processing"
+              ? "succeeded"
               : session.payment_status,
-          webhookVerified: false,
+          webhookVerified: session.payment_status === "paid",
           plan: metadata.plan || "premium",
           billingCycle:
             metadata.billingCycle === "yearly" ? "yearly" : "monthly",

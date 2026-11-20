@@ -13,7 +13,7 @@ import {
 
 const router = Router();
 
-async function activatePremiumForSession(session: Stripe.Checkout.Session) {
+export async function activatePremiumForSession(session: Stripe.Checkout.Session) {
   const metadata = session.metadata ?? {};
   const vendorId =
     metadata.vendorId ||
