@@ -1,16 +1,18 @@
 import { Router } from "express";
 import { getDB } from "../../config/db.js";
 import requireAuth from "../../middlewares/requireAuth.js";
+import requireRole from "../../middlewares/requireRole.js";
 import type { SavedServiceDocument } from "../../types/saved.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
 
 const router = Router();
 
-// DELETE /saved/:serviceId — Remove a saved service for the authenticated user
+// DELETE /saved/:serviceId — Remove a saved service for the authenticated customer
 router.delete(
   "/:serviceId",
   requireAuth,
+  requireRole("user"),
   catchAsync(async (req, res) => {
     const authUser = req.user;
     if (!authUser) {

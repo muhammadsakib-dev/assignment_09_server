@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getDB } from "../../config/db.js";
 import requireAuth from "../../middlewares/requireAuth.js";
+import requireRole from "../../middlewares/requireRole.js";
 import {
   type SavedServiceDocument,
   serializeSavedService,
@@ -10,10 +11,11 @@ import sendResponse from "../../utils/sendResponse.js";
 
 const router = Router();
 
-// GET /saved — List all saved wedding services for the authenticated user
+// GET /saved — List all saved wedding services for the authenticated customer
 router.get(
   "/",
   requireAuth,
+  requireRole("user"),
   catchAsync(async (req, res) => {
     const authUser = req.user;
     if (!authUser) {

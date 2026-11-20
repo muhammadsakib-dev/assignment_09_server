@@ -101,6 +101,16 @@ router.post(
       return;
     }
 
+    // Only customer accounts can submit booking requests
+    if (authUser.role !== "user") {
+      sendResponse(res, {
+        statusCode: 403,
+        success: false,
+        message: "Only customer accounts can submit booking requests.",
+      });
+      return;
+    }
+
     // Prevent duplicate active booking requests for the same service and event date
     const bookingsCol = db.collection<BookingDocument>("bookings");
     const duplicate = await bookingsCol.findOne({

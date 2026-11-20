@@ -2,6 +2,7 @@ import { Router } from "express";
 import { ObjectId } from "mongodb";
 import { getDB } from "../../config/db.js";
 import requireAuth from "../../middlewares/requireAuth.js";
+import requireRole from "../../middlewares/requireRole.js";
 import {
   type SavedServiceDocument,
   serializeSavedService,
@@ -16,6 +17,7 @@ const router = Router();
 router.post(
   "/",
   requireAuth,
+  requireRole("user"),
   catchAsync(async (req, res) => {
     const authUser = req.user;
     if (!authUser) {
