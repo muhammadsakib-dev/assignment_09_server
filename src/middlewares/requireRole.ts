@@ -13,7 +13,13 @@ export function requireRole(...allowedRoles: AuthenticatedUser["role"][]) {
       return;
     }
 
-    if (!allowedRoles.includes(req.user.role)) {
+    const userRole = req.user.role;
+    const isAllowed =
+      allowedRoles.includes(userRole) ||
+      (allowedRoles.includes("user") && userRole === "customer") ||
+      (allowedRoles.includes("customer") && userRole === "user");
+
+    if (!isAllowed) {
       sendResponse(res, {
         statusCode: 403,
         success: false,

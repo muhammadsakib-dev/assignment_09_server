@@ -10,7 +10,7 @@ export interface AuthenticatedUser {
   id: string;
   name: string;
   email: string;
-  role: "user" | "vendor" | "admin";
+  role: "user" | "customer" | "vendor" | "admin";
 }
 
 declare global {
@@ -232,8 +232,12 @@ export async function requireAuth(
       return;
     }
 
-    const normalizedRole =
-      user.role === "admin" || user.role === "vendor" ? user.role : "user";
+    const normalizedRole: AuthenticatedUser["role"] =
+      user.role === "admin" ||
+      user.role === "vendor" ||
+      user.role === "customer"
+        ? user.role
+        : "user";
 
     req.user = {
       id: user._id ? String(user._id) : String(user.id),
