@@ -38,7 +38,7 @@ router.get(
 
     if (authUser.role === "vendor") {
       filter.vendorEmail = authUser.email;
-    } else if (authUser.role === "user") {
+    } else if (authUser.role === "user" || authUser.role === "customer") {
       filter.userEmail = authUser.email;
     }
 

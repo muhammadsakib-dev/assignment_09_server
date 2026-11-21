@@ -40,7 +40,11 @@ router.get(
       usersCol.countDocuments({}),
       usersCol.countDocuments({ role: "vendor" }),
       usersCol.countDocuments({
-        $or: [{ role: "user" }, { role: { $exists: false } }],
+        $or: [
+          { role: "user" },
+          { role: "customer" },
+          { role: { $exists: false } },
+        ],
       }),
       servicesCol.countDocuments({}),
       servicesCol.countDocuments({ status: "pending" }),
@@ -79,7 +83,11 @@ router.get(
     if (rawRole === "vendor" || rawRole === "admin") {
       filter.role = rawRole;
     } else if (rawRole === "user" || rawRole === "customer") {
-      filter.$or = [{ role: "user" }, { role: { $exists: false } }];
+      filter.$or = [
+        { role: "user" },
+        { role: "customer" },
+        { role: { $exists: false } },
+      ];
     }
 
     const rawSearch =

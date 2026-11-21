@@ -102,7 +102,7 @@ router.post(
     }
 
     // Only customer accounts can submit booking requests
-    if (authUser.role !== "user") {
+    if (authUser.role !== "user" && authUser.role !== "customer") {
       sendResponse(res, {
         statusCode: 403,
         success: false,
