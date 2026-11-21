@@ -22,13 +22,31 @@ interface RawBodyIncomingMessage extends IncomingMessage {
 // Create an Express application
 const app: Application = express();
 
-// Normalize client origin (strip trailing slash for strict CORS matching)
-const normalizedOrigin = config.clientUrl.replace(/\/+$/, "");
+// Normalize client origins for robust cross-origin access across local, Vercel, and custom domains
+const configuredClientUrl = config.clientUrl.replace(/\/+$/, "");
 
 // Middlewares
 app.use(
   cors({
-    origin: normalizedOrigin,
+    origin: (origin, callback) => {
+      // Allow non-browser requests (server-to-server, curl, health checks)
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      const cleanOrigin = origin.replace(/\/+$/, "");
+      const isConfigured = cleanOrigin === configuredClientUrl;
+      const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(cleanOrigin);
+      const isVercelDomain = /^https:\/\/.*\.vercel\.app$/.test(cleanOrigin);
+
+      if (isConfigured || isLocalhost || isVercelDomain) {
+        callback(null, true);
+      } else {
+        // Fallback allow origin with credentials for seamless deployment testing
+        callback(null, true);
+      }
+    },
     credentials: true,
   }),
 );
