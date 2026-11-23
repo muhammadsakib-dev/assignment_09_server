@@ -14,7 +14,7 @@
 6. [Installation & Setup](#installation--setup)
 7. [Database Seeding](#database-seeding)
 8. [How to Run the Project Locally](#how-to-run-the-project-locally)
-9. [Evaluation & Testing Credentials](#evaluation--testing-credentials)
+9. [Access & Role Permissions](#access--role-permissions)
 10. [Repository & Live Deployment Links](#repository--live-deployment-links)
 
 ---
@@ -147,13 +147,15 @@ npm start
 
 ---
 
-## 🔑 Evaluation & Testing Credentials
+## 🔐 Access & Role Permissions
 
-| Role | Email | Password | Access / Permissions |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin@wedplan.com` | `WedPlan@2026` | Full Admin Dashboard (`/admin`), Manage Users (Block/Unblock), Moderate Services, View Transactions |
-| **Vendor** | `vendor@wedplan.com` | `WedPlan@2026` | Vendor Dashboard (`/vendor/dashboard`), Add Service, Manage Services, Accept/Reject Bookings, Subscription |
-| **Customer** | `customer@wedplan.com` | `WedPlan@2026` | Customer Dashboard (`/dashboard`), Browse & Filter Services, Submit Bookings, Cancel Pending Bookings |
+| Role | Access / Permissions |
+| :--- | :--- |
+| **Admin** | Full Admin Dashboard (`/admin`), Manage Users (Block/Unblock), Moderate Services, View Transactions |
+| **Vendor** | Vendor Dashboard (`/vendor/dashboard`), Add Service, Manage Services, Accept/Reject Bookings, Subscription |
+| **Customer** | Customer Dashboard (`/dashboard`), Browse & Filter Services, Submit Bookings, Cancel Pending Bookings |
+
+> **Security Note:** Testing credentials for evaluation are submitted directly via the private assignment submission form and are intentionally excluded from the public repository for security.
 
 ---
 
